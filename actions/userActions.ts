@@ -1,7 +1,6 @@
 "use server";
 
 import mongoDBConnection from "@/config/mongoDBConnect.ts";
-import { handleSignIn } from "@/helpers/handleSignIn.ts";
 
 import User from "@/models/UserModel.ts";
 import bcrypt from "bcryptjs";
@@ -21,15 +20,19 @@ export const createAUser = async (FormData) => {
 
 // create a new user
 
-export const userLogin = async (FormData) => {
-  const email = FormData.get("email");
-  const password = FormData.get("password");
+// export const userLogin = async (FormData) => {
+//   const email = FormData.get("email");
+//   const password = FormData.get("password");
 
-  // await signIn("credentials", {
-  //   redirect: false,
-  //   email,
-  //   password,
-  // });
+//   // await signIn("credentials", {
+//   //   redirect: false,
+//   //   email,
+//   //   password,
+//   // });
 
-  await handleSignIn({ email, password });
-};
+//   // const response = await axios.post(`http://localhost:3000/api/auth/login`);
+
+//   const response = await axi;
+
+//   console.log(response);
+// };

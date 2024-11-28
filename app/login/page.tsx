@@ -1,8 +1,54 @@
+"use client";
+
+import { signIn, useSession } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import React from "react";
+import { redirect } from "next/navigation";
+import React, { useState } from "react";
 
 export default function LoginPage() {
+  // State to handle loading, error, and success states
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  //
+  const { data } = useSession();
+
+  if (data) {
+    redirect("/");
+  }
+
+  const handleSubmitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target as HTMLFormElement);
+    const data = Object.fromEntries(formData.entries());
+
+    const email = data.email as string;
+    const password = data.password as string;
+
+    setIsLoading(true);
+    setError(null); // Clear any previous errors
+
+    // Attempt to sign in
+    const response = await signIn("credentials", {
+      redirect: false,
+      email,
+      password,
+    });
+
+    setIsLoading(false);
+
+    if (response?.error) {
+      setError(response.error);
+    } else if (response?.ok) {
+      redirect("/");
+      // Handle successful login here (redirect or show success message)
+      console.log("Login successful!");
+      // You can use a redirect here if needed, e.g., window.location.href = "/dashboard";
+    }
+  };
+
   return (
     <>
       <section className="bg-gray-50 dark:bg-gray-900">
@@ -25,7 +71,10 @@ export default function LoginPage() {
               <h1 className="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
                 Sign in to your account
               </h1>
-              <form className="space-y-4 md:space-y-6" action="#">
+              <form
+                className="space-y-4 md:space-y-6"
+                onSubmit={handleSubmitForm}
+              >
                 <div>
                   <label
                     htmlFor="email"
@@ -58,6 +107,9 @@ export default function LoginPage() {
                     required
                   />
                 </div>
+                {error && (
+                  <div className="text-red-600 text-sm mt-2">{error}</div>
+                )}
                 <div className="flex items-center justify-between">
                   <a
                     href="#"
@@ -69,8 +121,9 @@ export default function LoginPage() {
                 <button
                   type="submit"
                   className="w-full text-white bg-blue-600 hover:bg-primary-700 focus:ring-4 focus:outline-none focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800"
+                  disabled={isLoading}
                 >
-                  Sign in
+                  {isLoading ? "Signing in..." : "Sign in"}
                 </button>
                 <p className="text-sm font-light text-gray-500 dark:text-gray-400">
                   Don’t have an account yet?{" "}
